@@ -35,15 +35,34 @@ function login_history_menu() {
 }
 
 /**
- * Build history form.
+ * Select function.
  */
-function login_history_page_form() {
-  $output = drupal_render($output);
-  $query = db_select('login_history', 'l')
+function login_history_select() {
+  return $query = db_select('login_history', 'l')
     ->fields('l', array('uid', 'login', 'logintime'))
     ->orderBy('logintime', 'desc')
     ->execute() 
-    ->fetchAll();  
+    ->fetchAll();
+}
+
+/**
+ * Table function.
+ */
+function login_history_table($header, $rows) {
+  $output = drupal_render($output);
+  $output .= theme('table', array (
+      'header' => $header,
+      'rows' => $rows,
+    ) 
+  ); 
+  return $output;
+}
+
+/**
+ * Build history form.
+ */
+function login_history_page_form() {
+  $query = login_history_select();
   $header = array(
     array('data' => t('Uid')),
     array('data' => t('Username')),
@@ -57,24 +76,14 @@ function login_history_page_form() {
       array('data' => format_date($record -> logintime, 'long')),
     );
   }
-  $output .= theme('table', array (
-      'header' => $header,
-      'rows' => $rows,
-    )
-  );
-  return $output;
+  return login_history_table($header, $rows);
 }
 
 /**
  * Build count form.
  */
 function login_count_page_form() {
-  $output = drupal_render($output);
-  $query = db_select('login_history', 'l')
-    ->fields('l', array('uid', 'login', 'logintime'))
-    ->orderBy('logintime', 'desc')
-    ->execute() 
-    ->fetchAll();  
+  $query = login_history_select();
   $count = array();
   foreach ($query as $record) {
     if  (!isset($count[$record -> uid])) {
@@ -95,10 +104,5 @@ function login_count_page_form() {
       array('data' => $record['count']),
     );
   }
-  $output .= theme('table', array (
-    'header' => $header,
-    'rows' => $rows,
-    ) 
-  ); 
-  return $output;
+  return login_history_table($header, $rows);
 }

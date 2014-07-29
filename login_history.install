@@ -1,0 +1,21 @@
+<?php
+function login_history_schema() {
+  $schema['login_history'] = array(
+    'description' => t('Table for login history'),
+    'fields' => array(
+      'uid' => array(
+        'description' => t('Users identifier'),
+        'type' => 'int',),
+      'login' => array(
+        'description' => t('Users login'),
+        'length' => 256,
+        'type' => 'varchar',),
+      'logintime' => array(
+        'description' => t('The time of login'),
+        'type' => 'int',
+        //'mysql_type' => 'timestamp',
+        'default' => time(),),
+      ),
+    );
+  return $schema;
+}

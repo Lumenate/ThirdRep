@@ -1,0 +1,72 @@
+<?php
+/**
+ * Implements hook_user_login
+ */
+function login_history_user_login(&$edit, $account) {
+  db_insert('login_history')
+    ->fields(array(
+      'uid' => $account -> uid,
+      'login' => $account -> name,
+      'logintime' => REQUEST_TIME,
+    ))
+    ->execute();
+}
+
+/**
+ * Implements hook_menu(). 
+ */
+function login_history_menu() {
+  $items['login-history'] = array (
+    'title' => 'Login history',
+    'page callback' => 'login_history_page_form',
+    'access callback' => TRUE,
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Build history form.
+ */
+function login_history_page_form() {
+  $output = drupal_render($output);
+  $query = db_select('login_history', 'l')
+    ->fields('l', array('uid', 'login', 'logintime'))
+    ->orderBy('logintime', 'desc')
+    ->execute() 
+    ->fetchAll();  
+  $header = array(
+    array('data' => t('Uid')),
+    array('data' => t('Username')),
+    array('data' => t('Time')),
+  );
+  $rows = array();
+  $count = array();
+  foreach ($query as $record) {
+    $rows[] = array (
+      array('data' => $record -> uid),
+      array('data' => $record -> login),
+      array('data' => format_date($record -> logintime, 'long')),
+    );
+    if(!isset($count[$record -> uid])) {
+      $count[$record -> uid] = array();
+      $count[$record -> uid]['login'] = '';
+      $count[$record -> uid]['count'] = 0;
+    }
+    $count[$record -> uid]['login'] = $record -> login;
+    $count[$record -> uid]['count'] += 1;
+  }
+  foreach ($count as $record) {
+    $rows[] = array (
+      array('data' => $record['login']),
+      array('data' => $record['count']),
+    );
+  }
+    $output .= theme('table', array (
+    'header' => $header,
+    'rows' => $rows,
+    )
+  );
+  return $output;
+}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Implements hook_user_login
+ * Implements hook_user_login().
  */
 function login_history_user_login(&$edit, $account) {
   db_insert('login_history')
@@ -17,16 +17,16 @@ function login_history_user_login(&$edit, $account) {
  * Implements hook_menu(). 
  */
 function login_history_menu() {
-  $items['login-history'] = array (
+  $items['login-history'] = array(
     'title' => 'Login history',
-    'page callback' => 'login_history_page_form',
+    'page callback' => 'login_history_page',
     'access callback' => TRUE,
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
   );
-  $items['login-count'] = array (
+  $items['login-count'] = array(
     'title' => 'Login count',
-    'page callback' => 'login_count_page_form',
+    'page callback' => 'login_count_page',
     'access callback' => TRUE,
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
@@ -38,70 +38,90 @@ function login_history_menu() {
  * Select function.
  */
 function login_history_select() {
-  return $query = db_select('login_history', 'l')
+  $query = db_select('login_history', 'l')
     ->fields('l', array('uid', 'login', 'logintime'))
     ->orderBy('logintime', 'desc')
     ->execute() 
     ->fetchAll();
+  return $query;
 }
 
 /**
  * Table function.
  */
 function login_history_table($header, $rows) {
-  $output = drupal_render($output);
-  $output .= theme('table', array (
-      'header' => $header,
-      'rows' => $rows,
-    ) 
-  ); 
+  $attributes = array(
+    'header' => $header,
+    'rows' => $rows,
+  );
+  $output = theme('table', $attributes); 
   return $output;
 }
 
 /**
- * Build history form.
+ * Build history page.
  */
-function login_history_page_form() {
+function login_history_page() {
   $query = login_history_select();
   $header = array(
-    array('data' => t('Uid')),
-    array('data' => t('Username')),
-    array('data' => t('Time')),
+    array(
+      'data' => t('Uid')
+    ),
+    array(
+      'data' => t('Username')
+    ),
+    array(
+      'data' => t('Time')
+    ),
   );
   $rows = array();
   foreach ($query as $record) {
-    $rows[] = array (
-      array('data' => $record -> uid),
-      array('data' => $record -> login),
-      array('data' => format_date($record -> logintime, 'long')),
+    $rows[] = array(
+      array(
+        'data' => $record->uid
+      ),
+      array(
+        'data' => $record->login
+      ),
+      array(
+        'data' => format_date($record->logintime, 'long')
+      ),
     );
   }
   return login_history_table($header, $rows);
 }
 
 /**
- * Build count form.
+ * Build count page.
  */
-function login_count_page_form() {
+function login_count_page() {
   $query = login_history_select();
   $count = array();
   foreach ($query as $record) {
-    if  (!isset($count[$record -> uid])) {
-      $count[$record -> uid] = array();
-      $count[$record -> uid]['count'] = 0;
+    if (!isset($count[$record->uid])) {
+      $count[$record->uid] = array();
+      $count[$record->uid]['count'] = 0;
     }
-    $count[$record -> uid]['login'] = $record -> login;
-    $count[$record -> uid]['count'] += 1;
+    $count[$record->uid]['login'] = $record->login;
+    $count[$record->uid]['count'] += 1;
   }
   $header = array(
-    array('data' => t('Username')),
-    array('data' => t('Logins count')),
+    array(
+      'data' => t('Username')
+    ),
+    array(
+      'data' => t('Logins count')
+    ),
   );
   $rows = array();
   foreach ($count as $record) {
-    $rows[] = array (
-      array('data' => $record['login']),
-      array('data' => $record['count']),
+    $rows[] = array(
+      array(
+        'data' => $record['login']
+      ),
+      array(
+        'data' => $record['count']
+      ),
     );
   }
   return login_history_table($header, $rows);

@@ -15,7 +15,6 @@ function login_history_schema() {
       'logintime' => array(
         'description' => t('The time of login'),
         'type' => 'int',
-        //'mysql_type' => 'timestamp',
         'default' => time(),
       ),
     ),

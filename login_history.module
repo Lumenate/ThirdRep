@@ -74,7 +74,7 @@ function login_count_page_form() {
     ->fetchAll();  
   $count = array();
   foreach ($query as $record) {
-    if(!isset($count[$record -> uid])) {
+    if  (!isset($count[$record -> uid])) {
       $count[$record -> uid] = array();
       $count[$record -> uid]['count'] = 0;
     }

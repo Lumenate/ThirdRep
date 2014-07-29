@@ -51,7 +51,6 @@ function login_history_page_form() {
     );
     if(!isset($count[$record -> uid])) {
       $count[$record -> uid] = array();
-      $count[$record -> uid]['login'] = '';
       $count[$record -> uid]['count'] = 0;
     }
     $count[$record -> uid]['login'] = $record -> login;

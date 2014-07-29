@@ -5,17 +5,20 @@ function login_history_schema() {
     'fields' => array(
       'uid' => array(
         'description' => t('Users identifier'),
-        'type' => 'int',),
+        'type' => 'int',
+      ),
       'login' => array(
         'description' => t('Users login'),
         'length' => 256,
-        'type' => 'varchar',),
+        'type' => 'varchar',
+      ),
       'logintime' => array(
         'description' => t('The time of login'),
         'type' => 'int',
         //'mysql_type' => 'timestamp',
-        'default' => time(),),
+        'default' => time(),
       ),
-    );
+    ),
+  );
   return $schema;
 }

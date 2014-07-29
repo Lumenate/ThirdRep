@@ -58,8 +58,8 @@ function login_history_page_form() {
     );
   }
   $output .= theme('table', array (
-    'header' => $header,
-    'rows' => $rows,
+      'header' => $header,
+      'rows' => $rows,
     )
   );
   return $output;

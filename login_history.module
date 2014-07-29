@@ -23,6 +23,13 @@ function login_history_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
   );
+  $items['login-count'] = array (
+    'title' => 'Login count',
+    'page callback' => 'login_count_page_form',
+    'access callback' => TRUE,
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
   return $items;
 }
 
@@ -42,13 +49,30 @@ function login_history_page_form() {
     array('data' => t('Time')),
   );
   $rows = array();
-  $count = array();
   foreach ($query as $record) {
     $rows[] = array (
       array('data' => $record -> uid),
       array('data' => $record -> login),
       array('data' => format_date($record -> logintime, 'long')),
     );
+  }
+  $output .= theme('table', array (
+    'header' => $header,
+    'rows' => $rows,
+    )
+  );
+  return $output;
+}
+
+function login_count_page_form() {
+  $output = drupal_render($output);
+  $query = db_select('login_history', 'l')
+    ->fields('l', array('uid', 'login', 'logintime'))
+    ->orderBy('logintime', 'desc')
+    ->execute() 
+    ->fetchAll();  
+  $count = array();
+  foreach ($query as $record) {
     if(!isset($count[$record -> uid])) {
       $count[$record -> uid] = array();
       $count[$record -> uid]['count'] = 0;
@@ -56,16 +80,21 @@ function login_history_page_form() {
     $count[$record -> uid]['login'] = $record -> login;
     $count[$record -> uid]['count'] += 1;
   }
+  $header = array(
+    array('data' => t('Username')),
+    array('data' => t('Logins count')),
+  );
+  $rows = array();
   foreach ($count as $record) {
     $rows[] = array (
       array('data' => $record['login']),
       array('data' => $record['count']),
     );
   }
-    $output .= theme('table', array (
+  $output .= theme('table', array (
     'header' => $header,
     'rows' => $rows,
-    )
-  );
+    ) 
+  ); 
   return $output;
 }

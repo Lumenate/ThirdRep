@@ -65,6 +65,9 @@ function login_history_page_form() {
   return $output;
 }
 
+/**
+ * Build count form.
+ */
 function login_count_page_form() {
   $output = drupal_render($output);
   $query = db_select('login_history', 'l')
